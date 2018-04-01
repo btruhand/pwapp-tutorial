@@ -51,8 +51,12 @@
     var key = selected.value;
     var label = selected.textContent;
     // TODO init the app.selectedCities array here
+    if (!app.selectedCities) {
+      app.selectedCities = [];
+    }
     app.getForecast(key, label);
     // TODO push the selected city to the array and save here
+    app.selectedCities.push({key, label});
     app.toggleAddDialog(false);
   });
 
@@ -323,10 +327,8 @@
    *   SimpleDB (https://gist.github.com/inexorabletash/c8069c042b734519680c)
    ************************************************************************/
   const selectedCities = localStorage.getItem('cities');
-  if (!selectedCities) {
-    app.selectedCities = JSON.parse(selectedCities);
-    app.selectedCities.forEach(function(city) {
-      app.getForecast(city.key, city.label);
+  if (!selectedCities) { app.selectedCities = JSON.parse(selectedCities); app.selectedCities.forEach(function(city) {
+         app.getForecast(city.key, city.label);
     });
   } else {
     /* The user is using the app for the first time, or the user has not
@@ -342,4 +344,14 @@
   };
 
   // TODO add service worker code here
-})();
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker
+      .register('./service-worker.js')
+      .then((registration) => {
+        console.log('Service Worker Registered: ', registration)
+      })
+      .catch((error) => {
+        console.log('Service worker registration error: ', error)
+      })
+  }
+})()
